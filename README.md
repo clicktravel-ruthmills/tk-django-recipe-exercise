@@ -77,6 +77,6 @@ Should delete the previous existing ingredients and put "casa-tarradellas" as on
 ### DELETE /recipes/1/
 
 ### Response:
-### HTTP 204 (NO CONTENT)
+    HTTP 204 (NO CONTENT)
 
 Should delete the targeted recipe AND its ingredients.
