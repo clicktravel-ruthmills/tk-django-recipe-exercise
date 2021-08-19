@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 
 router = DefaultRouter()
 
-app_name = 'recipe'
+app_name = 'recipes'
 
 urlpatterns = [
     path('', include(router.urls))
