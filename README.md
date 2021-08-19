@@ -54,3 +54,29 @@ Ingredient: Name, Recipe (ForeignKey) ← assume a given ingredient belongs only
         “ingredients”: [{“name”: “dough”}, {“name”: “cheese”}, {“name”: “tomato”}]
       }
     ]
+
+## Example recipe edit
+### PATCH /recipes/1/
+    {
+      “name”: “Pizza”,
+      “description”: “Put it in the oven”,
+      “ingredients”: [{“name”: “casa-tarradellas”}]
+    }
+
+Should delete the previous existing ingredients and put “casa-tarradellas” as only ingredient for recipe.
+
+### Response:
+    {
+      “id”: 1,
+      “name”: “Pizza”,
+      “description”: “Put it in the oven”,
+      “ingredients”: [{“name”: “casa-tarradellas”}]
+    }
+
+## Example recipe delete
+### DELETE /recipes/1/
+
+### Response:
+### HTTP 204 (NO CONTENT)
+
+Should delete the targeted recipe AND its ingredients.
