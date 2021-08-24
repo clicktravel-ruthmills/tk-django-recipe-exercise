@@ -6,14 +6,6 @@ class Recipe(models.Model):
     name = models.CharField(max_length=255)
     description = models.CharField(max_length=255)
 
-    def create(self, validated_data):
-        ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(**validated_data)
-        if ingredients:
-            for ingredient in ingredients:
-                Ingredient.objects.create(recipe=recipe, **ingredient)
-        return recipe
-
     def __str__(self):
         return self.title
 
