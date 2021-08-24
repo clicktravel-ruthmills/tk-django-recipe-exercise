@@ -134,8 +134,11 @@ class RecipeApiTest(TestCase):
 
     def test_updating_a_recipe(self):
         """Test updating a recipe"""
-        createResponse = _create_pizza_recipe(self)
-        recipe_id = createResponse.data['id']
+        pizzaCreateResponse = _create_pizza_recipe(self)
+        pizza_recipe_id = pizzaCreateResponse.data['id']
+
+        cheeseburgerCreateResponse = _create_cheeseburger_recipe(self)
+        cheeseburger_recipe_id = cheeseburgerCreateResponse.data['id']
 
         payload = {
             'name': 'Pizza',
@@ -144,40 +147,62 @@ class RecipeApiTest(TestCase):
                 {'name': 'casa-tarradellas'}
             ]
         }
-        updateResponse = self.client.patch(
-            detail_url(recipe_id),
+        pizzaUpdateResponse = self.client.patch(
+            detail_url(pizza_recipe_id),
             data=payload,
             format='json'
         )
 
-        self.assertEqual(updateResponse.status_code, status.HTTP_200_OK)
+        self.assertEqual(pizzaUpdateResponse.status_code, status.HTTP_200_OK)
 
-        retrieveResponse = self.client.get(detail_url(recipe_id))
+        pizzaRetrieveResponse = self.client.get(
+            detail_url(pizza_recipe_id)
+        )
 
-        self.assertEqual(retrieveResponse.status_code, status.HTTP_200_OK)
-        recipe = retrieveResponse.data
+        self.assertEqual(pizzaRetrieveResponse.status_code, status.HTTP_200_OK)
+        pizza_recipe = pizzaRetrieveResponse.data
 
-        self.assertEqual(createResponse.data['id'], recipe['id'])
-        self.assertEqual(createResponse.data['name'], recipe['name'])
         self.assertEqual(
-            createResponse.data['description'], recipe['description']
+            pizzaCreateResponse.data['id'], pizza_recipe['id']
         )
         self.assertEqual(
-            createResponse.data['description'],
-            recipe['description']
+            pizzaCreateResponse.data['name'], pizza_recipe['name']
         )
-        ingredients = recipe['ingredients']
-        for ingredient in ingredients:
+        self.assertEqual(
+            pizzaCreateResponse.data['description'],
+            pizza_recipe['description']
+        )
+        self.assertEqual(
+            pizzaCreateResponse.data['description'],
+            pizza_recipe['description']
+        )
+        pizza_ingredients = pizza_recipe['ingredients']
+        for pizza_ingredient in pizza_ingredients:
             self.assertIn(
-                ingredient['name'], 'casa-tarradellas'
+                pizza_ingredient['name'], 'casa-tarradellas'
             )
             self.assertNotIn(
-                ingredient['name'], 'dough cheese tomato'
+                pizza_ingredient['name'], 'dough cheese tomato'
             )
+
+        cheeseburgerRetrieveResponse = self.client.get(
+            detail_url(cheeseburger_recipe_id)
+        )
+
+        self.assertEqual(
+            cheeseburgerRetrieveResponse.status_code, status.HTTP_200_OK
+        )
+
+        cheeseburger_recipe = cheeseburgerRetrieveResponse.data
+        cheeseburger_ingredients = cheeseburger_recipe['ingredients']
+
+        # Verify that the 'cheese' ingredient in Cheeseburger still exists.
+        self.assertEqual(len(cheeseburger_ingredients), 4)
 
     def test_searching_for_a_recipe_by_name_matches(self):
         """Test searching for a recipe by name where the recipe matches"""
         createResponse = _create_pizza_recipe(self)
+        _create_cheeseburger_recipe(self)
 
         searchResponse = self.client.get(search_url('Pi'))
 
@@ -235,3 +260,9 @@ class RecipeApiTest(TestCase):
         self.assertEqual(
             cheeseburgerRetrieveResponse.status_code, status.HTTP_200_OK
         )
+
+        cheeseburger_recipe = cheeseburgerRetrieveResponse.data
+        cheeseburger_ingredients = cheeseburger_recipe['ingredients']
+
+        # Verify that the 'cheese' ingredient in Cheeseburger still exists.
+        self.assertEqual(len(cheeseburger_ingredients), 4)
