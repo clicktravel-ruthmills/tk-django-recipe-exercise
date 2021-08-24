@@ -69,7 +69,7 @@ class RecipeApiTest(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
-        self.assertEqual(getattr(recipe, 'name'), 'Pizza')
+        self.assertEqual(recipe.name, 'Pizza')
         self.assertEqual(
             getattr(recipe, 'description'), 'Put it in the oven'
         )
