@@ -71,13 +71,13 @@ class RecipeApiTest(TestCase):
         recipe = Recipe.objects.get(id=res.data['id'])
         self.assertEqual(recipe.name, 'Pizza')
         self.assertEqual(
-            getattr(recipe, 'description'), 'Put it in the oven'
+            recipe.description, 'Put it in the oven'
         )
         ingredients = Ingredient.objects.filter(recipe=res.data['id'])
         self.assertEqual(len(ingredients), 3)
         for ingredient in ingredients:
             self.assertIn(
-                getattr(ingredient, 'name'), 'dough cheese tomato'
+                ingredient.name, 'dough cheese tomato'
             )
 
     def test_retrieving_all_recipes(self):
