@@ -10,7 +10,7 @@ from core.models import Recipe, Ingredient
 RECIPES_URL = reverse('recipe:recipe-list')
 
 
-def _create_recipe(self):
+def _create_pizza_recipe(self):
     payload = {
         'name': 'Pizza',
         'description': 'Put it in the oven',
@@ -18,6 +18,21 @@ def _create_recipe(self):
             {'name': 'dough'},
             {'name': 'cheese'},
             {'name': 'tomato'}
+        ]
+    }
+    res = self.client.post(RECIPES_URL, data=payload, format='json')
+    return res
+
+
+def _create_cheeseburger_recipe(self):
+    payload = {
+        'name': 'Cheeseburger',
+        'description': 'Buy it from McDonalds',
+        'ingredients': [
+            {'name': 'beef patty'},
+            {'name': 'cheese'},
+            {'name': 'burger bun'},
+            {'name': 'gherkin'}
         ]
     }
     res = self.client.post(RECIPES_URL, data=payload, format='json')
@@ -52,7 +67,7 @@ class RecipeApiTest(TestCase):
 
     def test_create_recipe_with_ingredients(self):
         """Test creating a recipe with ingredients is successful"""
-        res = _create_recipe(self)
+        res = _create_pizza_recipe(self)
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
         recipe = Recipe.objects.get(id=res.data['id'])
@@ -69,7 +84,7 @@ class RecipeApiTest(TestCase):
 
     def test_retrieving_all_recipes(self):
         """Test retrieving all recipes"""
-        createResponse = _create_recipe(self)
+        createResponse = _create_pizza_recipe(self)
 
         listResponse = self.client.get(RECIPES_URL)
 
@@ -94,7 +109,7 @@ class RecipeApiTest(TestCase):
 
     def test_retrieving_single_recipe_by_id(self):
         """Test retrieving a single recipe by ID"""
-        createResponse = _create_recipe(self)
+        createResponse = _create_pizza_recipe(self)
         recipe_id = createResponse.data['id']
 
         retrieveResponse = self.client.get(detail_url(recipe_id))
@@ -119,7 +134,7 @@ class RecipeApiTest(TestCase):
 
     def test_updating_a_recipe(self):
         """Test updating a recipe"""
-        createResponse = _create_recipe(self)
+        createResponse = _create_pizza_recipe(self)
         recipe_id = createResponse.data['id']
 
         payload = {
@@ -162,7 +177,7 @@ class RecipeApiTest(TestCase):
 
     def test_searching_for_a_recipe_by_name_matches(self):
         """Test searching for a recipe by name where the recipe matches"""
-        createResponse = _create_recipe(self)
+        createResponse = _create_pizza_recipe(self)
 
         searchResponse = self.client.get(search_url('Pi'))
 
@@ -187,7 +202,7 @@ class RecipeApiTest(TestCase):
 
     def test_searching_for_a_recipe_by_name_no_match(self):
         """Test searching for a recipe by name where there is no match"""
-        _create_recipe(self)
+        _create_pizza_recipe(self)
 
         searchResponse = self.client.get(search_url('Kebab'))
 
@@ -196,16 +211,27 @@ class RecipeApiTest(TestCase):
 
     def test_deleting_a_recipe(self):
         """Test deleting a recipe"""
-        createResponse = _create_recipe(self)
-        recipe_id = createResponse.data['id']
+        pizzaCreateResponse = _create_pizza_recipe(self)
+        pizza_recipe_id = pizzaCreateResponse.data['id']
 
-        deleteResponse = self.client.delete(detail_url(recipe_id))
+        cheeseburgerCreateResponse = _create_cheeseburger_recipe(self)
+        cheeseburger_recipe_id = cheeseburgerCreateResponse.data['id']
+
+        pizzaDeleteResponse = self.client.delete(detail_url(pizza_recipe_id))
         self.assertEqual(
-            deleteResponse.status_code, status.HTTP_204_NO_CONTENT
+            pizzaDeleteResponse.status_code, status.HTTP_204_NO_CONTENT
         )
 
-        retrieveResponse = self.client.get(detail_url(recipe_id))
+        pizzaRetrieveResponse = self.client.get(detail_url(pizza_recipe_id))
 
         self.assertEqual(
-            retrieveResponse.status_code, status.HTTP_404_NOT_FOUND
+            pizzaRetrieveResponse.status_code, status.HTTP_404_NOT_FOUND
+        )
+
+        cheeseburgerRetrieveResponse = self.client.get(
+            detail_url(cheeseburger_recipe_id)
+        )
+
+        self.assertEqual(
+            cheeseburgerRetrieveResponse.status_code, status.HTTP_200_OK
         )
