@@ -23,9 +23,8 @@ def search_url(name):
 class RecipeApiTest(TestCase):
     """Tests for the Recipe API"""
 
-    @classmethod
-    def setUp(cls):
-        cls.client = APIClient()
+    def setUp(self):
+        self.client = APIClient()
 
     def _create_pizza_recipe(self):
         payload = {
