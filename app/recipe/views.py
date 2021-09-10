@@ -11,7 +11,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
 
     def get_queryset(self):
-        queryset = self.queryset
+        queryset = Recipe.objects.all()
         name = self.request.query_params.get('name')
         if name:
             queryset = queryset.filter(name__contains=name)
