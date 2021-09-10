@@ -25,6 +25,9 @@ class RecipeSerializer(serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
         instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get(
+            'description', instance.description
+        )
         Ingredient.objects.filter(recipe=instance.id).delete()
         ingredients = validated_data.pop('ingredients')
         for ingredient in ingredients:
